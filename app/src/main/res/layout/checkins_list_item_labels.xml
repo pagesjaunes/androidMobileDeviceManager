@@ -13,10 +13,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="left"
-            android:text="@string/location_column"
+            android:text="@string/device_column"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@color/table_text_header"
             android:textStyle="bold" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:paddingLeft="30dp"
+        android:text="@string/user_column"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="@color/table_text_header"
+        android:textStyle="bold" />
 
     <TextView
             android:layout_width="match_parent"

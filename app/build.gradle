@@ -1,85 +1,46 @@
-buildscript {
-    repositories {
-        maven { url 'http://repo1.maven.org/maven2' }
-        mavenLocal()
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:0.12.+'
-    }
-}
-apply plugin: 'android'
-
-repositories {
-    maven { url 'https://github.com/donnfelker/mvn-repo/raw/master/' }
-    mavenLocal()
-    mavenCentral()
-}
-
-dependencies {
-    compile 'com.android.support:appcompat-v7:19.1.+'
-    compile 'com.google.code.gson:gson:2.2.4'
-    compile 'com.squareup.dagger:dagger:1.0.1'
-    compile 'com.squareup.dagger:dagger-compiler:1.0.1'
-    compile 'com.jakewharton:butterknife:1.3.2'
-    compile 'com.actionbarsherlock:viewpagerindicator:2.4.1'
-    compile 'com.nineoldandroids:library:2.4.0'
-    compile 'com.github.kevinsawicki:android-pusher:0.6'
-    compile 'com.github.kevinsawicki:wishlist:0.9'
-    compile 'com.squareup:otto:1.3.4'
-    compile 'com.squareup.picasso:picasso:1.1.1'
-    compile 'com.squareup.retrofit:retrofit:1.5.1'
+apply plugin: 'com.android.application'
+apply plugin: 'com.neenbedankt.android-apt'
 
 
-
-    androidTestCompile 'junit:junit:4.11'
-    androidTestCompile 'org.hamcrest:hamcrest-library:1.3'
-    androidTestCompile 'org.mockito:mockito-core:1.9.5'
+def getDate() {
+    def date = new Date()
+    def formattedDate = date.format('yyyyMMdd')
+    return formattedDate
 }
 
 android {
-    compileSdkVersion 19
-    buildToolsVersion '19.1.0'
+    compileSdkVersion 22
+    buildToolsVersion "22.0.1"
 
     defaultConfig {
-        minSdkVersion 8
-        targetSdkVersion 19
-        versionCode 102
-        versionName '1.0'
+        applicationId "fr.pagesjaunes.mdm"
+        minSdkVersion 14
+        targetSdkVersion 22
+        versionCode getDate() as int
+        versionName "1.0"
     }
-
-    packagingOptions {
-        // Exclude file to avoid
-        // Error: Duplicate files during packaging of APK
-        exclude 'META-INF/services/javax.annotation.processing.Processor'
-    }
-
-    // signingConfigs {
-        // release {
-            // storeFile file(System.getenv('ANDROID_KEYSTORE_PATH'))
-            // storePassword System.getenv('ANDROID_STORE_PASS')
-            // keyAlias System.getenv('ANDROID_KEY_ALIAS')
-            // keyPassword System.getenv('ANDROID_KEY_PASS')
-        // }
-    // }
-
-    lintOptions {
-        abortOnError false
-    }
-
     buildTypes {
-        debug {
-            applicationIdSuffix '.debug'
-            runProguard false
-            // zipAlign false // this is default for debug
-        }
         release {
-            // runProguard true
-            // proguardFile '..\proguard.cfg'
-            // signingConfig signingConfigs.release
-            // zipAlign true // this is default for release
-            // testPackageName 'fr.pagesjaunes.mdm.tests'
-            // testInstrumentationRunner 'android.test.InstrumentationTestRunner' // this is the default
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    packagingOptions {
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.android.support:appcompat-v7:22.0.0'
+    compile 'com.google.code.gson:gson:2.3.1'
+    compile 'com.squareup.dagger:dagger:1.2.2'
+    apt 'com.squareup.dagger:dagger-compiler:1.2.2'
+  //  compile 'com.squareup.dagger:dagger-compiler:1.2.2'
+    compile 'com.jakewharton:butterknife:7.0.1'
+    compile 'com.squareup:otto:1.3.7'
+    compile 'com.squareup.picasso:picasso:2.5.2'
+    compile 'com.squareup.retrofit:retrofit:1.9.0'
+    compile 'com.parse:parse-android:1.10.1'
 }

@@ -30,28 +30,24 @@ public class BootstrapPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        return 3;
+        return 1;
     }
 
     @Override
     public Fragment getItem(final int position) {
         final Fragment result;
+        Bundle extras = new Bundle();
         switch (position) {
+
             case 0:
-                result = new NewsListFragment();
-                break;
-            case 1:
-                result = new UserListFragment();
-                break;
-            case 2:
-                result = new CheckInsListFragment();
+                result = new DevicesListFragment();
                 break;
             default:
                 result = null;
                 break;
         }
         if (result != null) {
-            result.setArguments(new Bundle()); //TODO do we need this?
+            result.setArguments(extras);
         }
         return result;
     }
@@ -63,10 +59,8 @@ public class BootstrapPagerAdapter extends FragmentPagerAdapter {
                 return resources.getString(R.string.page_news);
             case 1:
                 return resources.getString(R.string.page_users);
-            case 2:
-                return resources.getString(R.string.page_checkins);
             default:
                 return null;
         }
     }
-}
+ }

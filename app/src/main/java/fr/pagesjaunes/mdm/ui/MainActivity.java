@@ -3,7 +3,7 @@
 package fr.pagesjaunes.mdm.ui;
 
 import android.accounts.OperationCanceledException;
-import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -13,18 +13,24 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 
-import fr.pagesjaunes.mdm.BootstrapServiceProvider;
-import fr.pagesjaunes.mdm.R;
-import fr.pagesjaunes.mdm.core.BootstrapService;
-import fr.pagesjaunes.mdm.events.NavItemSelectedEvent;
-import fr.pagesjaunes.mdm.util.Ln;
-import fr.pagesjaunes.mdm.util.SafeAsyncTask;
-import fr.pagesjaunes.mdm.util.UIUtils;
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseUser;
+import com.parse.SaveCallback;
 import com.squareup.otto.Subscribe;
 
 import javax.inject.Inject;
 
-import butterknife.Views;
+import butterknife.ButterKnife;
+import fr.pagesjaunes.mdm.BootstrapServiceProvider;
+import fr.pagesjaunes.mdm.R;
+import fr.pagesjaunes.mdm.core.BootstrapService;
+import fr.pagesjaunes.mdm.core.Device;
+import fr.pagesjaunes.mdm.events.NavItemSelectedEvent;
+import fr.pagesjaunes.mdm.util.Ln;
+import fr.pagesjaunes.mdm.util.SafeAsyncTask;
+import fr.pagesjaunes.mdm.util.UIUtils;
 
 
 /**
@@ -38,8 +44,9 @@ public class MainActivity extends BootstrapFragmentActivity {
     @Inject protected BootstrapServiceProvider serviceProvider;
 
     private boolean userHasAuthenticated = false;
+	public static final String PREFS_NAME = "settings";
 
-    private DrawerLayout drawerLayout;
+	private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
     private CharSequence drawerTitle;
     private CharSequence title;
@@ -59,12 +66,12 @@ public class MainActivity extends BootstrapFragmentActivity {
         }
 
         // View injection with Butterknife
-        Views.inject(this);
+        ButterKnife.bind(this);
 
         // Set up navigation drawer
         title = drawerTitle = getTitle();
 
-        if(!isTablet()) {
+        if(!isTablet()) { // was
             drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
             drawerToggle = new ActionBarDrawerToggle(
                     this,                    /* Host activity */
@@ -107,6 +114,9 @@ public class MainActivity extends BootstrapFragmentActivity {
 
     }
 
+
+
+
     private boolean isTablet() {
         return UIUtils.isTablet(this);
     }
@@ -114,8 +124,8 @@ public class MainActivity extends BootstrapFragmentActivity {
     @Override
     protected void onPostCreate(final Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-
-        if(!isTablet()) {
+getCurrentUser();
+        if(!isTablet()) { // was
             // Sync the toggle state after onRestoreInstanceState has occurred.
             drawerToggle.syncState();
         }
@@ -166,7 +176,7 @@ public class MainActivity extends BootstrapFragmentActivity {
             protected void onSuccess(final Boolean hasAuthenticated) throws Exception {
                 super.onSuccess(hasAuthenticated);
                 userHasAuthenticated = true;
-                initScreen();
+				initScreen();
             }
         }.execute();
     }
@@ -174,7 +184,7 @@ public class MainActivity extends BootstrapFragmentActivity {
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
 
-        if (!isTablet() && drawerToggle.onOptionsItemSelected(item)) {
+        if (!isTablet() && drawerToggle.onOptionsItemSelected(item)) { // was
             return true;
         }
 
@@ -182,19 +192,19 @@ public class MainActivity extends BootstrapFragmentActivity {
             case android.R.id.home:
                 //menuDrawer.toggleMenu();
                 return true;
-            case R.id.timer:
-                navigateToTimer();
-                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    private void navigateToTimer() {
-        final Intent i = new Intent(this, BootstrapTimerActivity.class);
-        startActivity(i);
-    }
 
+    public void showVersion()
+    {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        CarouselFragment carousel = (CarouselFragment) fragmentManager.findFragmentById(R.id.container);
+        carousel.pager.setCurrentItem(1);
+
+    }
     @Subscribe
     public void onNavigationItemSelected(NavItemSelectedEvent event) {
 
@@ -204,11 +214,106 @@ public class MainActivity extends BootstrapFragmentActivity {
             case 0:
                 // Home
                 // do nothing as we're already on the home screen.
-                break;
-            case 1:
-                // Timer
-                navigateToTimer();
+				getCurrentUser();
                 break;
         }
     }
+
+	private void getCurrentUser()
+	{
+		new SafeAsyncTask<Boolean>()
+		{
+			@Override
+			public Boolean call() throws Exception
+			{
+				return updateCurrentDevice();
+			}
+
+			@Override
+			protected void onException(final Exception e) throws RuntimeException
+			{
+				super.onException(e);
+				if (e instanceof OperationCanceledException)
+				{
+					// User cancelled the authentication process (back button, etc).
+					// Since auth could not take place, lets finish this activity.
+				}
+			}
+
+			@Override
+			protected void onSuccess(Boolean result) throws Exception
+			{
+				super.onSuccess(result);
+			}
+		}.execute();
+
+		ItemListFragment currentFragment = (ItemListFragment)this.getSupportFragmentManager().findFragmentById(R.id.vp_pages);
+		if (currentFragment != null)
+		{
+			currentFragment.forceRefresh();
+		}
+	}
+
+	private Boolean updateCurrentDevice()
+	{
+		SharedPreferences prefs = this.getSharedPreferences(PREFS_NAME, 0);
+		Device currentDevice;
+		String deviceId = prefs.getString("deviceId", null);
+
+		currentDevice = new Device();
+		if (deviceId != null)
+		{
+			currentDevice = (Device) Device.createWithoutData("Device", deviceId);
+			currentDevice.fetchIfNeededInBackground(new GetCallback<ParseObject>()
+			{
+				@Override
+				public void done(ParseObject object, ParseException e)
+				{
+                    if (object != null)
+                    {
+                        Device currentDevice = (Device) object;
+                        currentDevice.setManufacturer(android.os.Build.BRAND);
+                        currentDevice.setModel(android.os.Build.MODEL);
+                        currentDevice.setType("");
+                        currentDevice.setOsVersion(android.os.Build.VERSION.RELEASE);
+                        currentDevice.setUser(ParseUser.getCurrentUser());
+                        currentDevice.saveInBackground();
+                    }
+                    else
+                    {
+                        e.printStackTrace();
+                    }
+				}
+			});
+		} else
+		{
+
+			currentDevice.setManufacturer(android.os.Build.BRAND);
+			currentDevice.setModel(android.os.Build.MODEL);
+			currentDevice.setType("");
+			currentDevice.setOsVersion(android.os.Build.VERSION.RELEASE);
+			currentDevice.setUser(ParseUser.getCurrentUser());
+
+			currentDevice.saveInBackground(new SaveCallback()
+			{
+				@Override
+				public void done(ParseException e)
+				{
+					Ln.d("Save ");
+				}
+			});
+		}
+		if (deviceId == null)
+		{
+			SharedPreferences.Editor editor = prefs.edit();
+			deviceId = currentDevice.getObjectId();
+			editor.putString("deviceId", deviceId);
+			editor.commit();
+		}
+
+		//		Toast.makeText(getActivity().getApplicationContext(), "" + Build.BRAND + Build.DEVICE + Build.MANUFACTURER + "etc..", Toast.LENGTH_LONG).show();
+		return deviceId != null;
+
+	}
+
 }

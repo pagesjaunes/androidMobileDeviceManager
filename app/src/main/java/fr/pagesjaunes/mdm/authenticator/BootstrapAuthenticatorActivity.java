@@ -1,13 +1,5 @@
 package fr.pagesjaunes.mdm.authenticator;
 
-import static android.R.layout.simple_dropdown_item_1line;
-import static android.accounts.AccountManager.KEY_ACCOUNT_NAME;
-import static android.accounts.AccountManager.KEY_ACCOUNT_TYPE;
-import static android.accounts.AccountManager.KEY_AUTHTOKEN;
-import static android.accounts.AccountManager.KEY_BOOLEAN_RESULT;
-import static android.view.KeyEvent.ACTION_DOWN;
-import static android.view.KeyEvent.KEYCODE_ENTER;
-import static android.view.inputmethod.EditorInfo.IME_ACTION_DONE;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Dialog;
@@ -29,6 +21,19 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
+import com.parse.ParseException;
+import com.parse.ParseUser;
+import com.parse.SignUpCallback;
+import com.squareup.otto.Bus;
+import com.squareup.otto.Subscribe;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import fr.pagesjaunes.mdm.Injector;
 import fr.pagesjaunes.mdm.R;
 import fr.pagesjaunes.mdm.R.id;
@@ -36,22 +41,21 @@ import fr.pagesjaunes.mdm.R.layout;
 import fr.pagesjaunes.mdm.R.string;
 import fr.pagesjaunes.mdm.core.BootstrapService;
 import fr.pagesjaunes.mdm.core.Constants;
-import fr.pagesjaunes.mdm.core.User;
 import fr.pagesjaunes.mdm.events.UnAuthorizedErrorEvent;
 import fr.pagesjaunes.mdm.ui.TextWatcherAdapter;
 import fr.pagesjaunes.mdm.util.Ln;
 import fr.pagesjaunes.mdm.util.SafeAsyncTask;
-import com.github.kevinsawicki.wishlist.Toaster;
-import com.squareup.otto.Bus;
-import com.squareup.otto.Subscribe;
-
-import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
-
-import butterknife.InjectView;
-import butterknife.Views;
+import fr.pagesjaunes.mdm.wishlist.Toaster;
 import retrofit.RetrofitError;
+
+import static android.R.layout.simple_dropdown_item_1line;
+import static android.accounts.AccountManager.KEY_ACCOUNT_NAME;
+import static android.accounts.AccountManager.KEY_ACCOUNT_TYPE;
+import static android.accounts.AccountManager.KEY_AUTHTOKEN;
+import static android.accounts.AccountManager.KEY_BOOLEAN_RESULT;
+import static android.view.KeyEvent.ACTION_DOWN;
+import static android.view.KeyEvent.KEYCODE_ENTER;
+import static android.view.inputmethod.EditorInfo.IME_ACTION_DONE;
 
 /**
  * Activity to authenticate the user against an API (example API on Parse.com)
@@ -77,45 +81,37 @@ public class BootstrapAuthenticatorActivity extends ActionBarAccountAuthenticato
      * PARAM_AUTHTOKEN_TYPE
      */
     public static final String PARAM_AUTHTOKEN_TYPE = "authtokenType";
-
-
-    private AccountManager accountManager;
-
+    @Bind(id.et_username) protected AutoCompleteTextView usernameText;
+    @Bind(id.et_email) protected AutoCompleteTextView emailText;
+    @Bind(id.et_password) protected EditText passwordText;
+    @Bind(id.b_signin) protected Button signInButton;
+    private final TextWatcher watcher = validationTextWatcher();
+	@Bind(id.b_signup_ui) protected Button signUpUIButton;
+	@Bind(id.b_signup) protected Button signUpButton;
+	private final TextWatcher signupWatcher = signupTextWatcher();
+    /**
+     * Was the original caller asking for an entirely new account?
+     */
+    protected boolean requestNewAccount = false;
     @Inject BootstrapService bootstrapService;
     @Inject Bus bus;
-
-    @InjectView(id.et_email) protected AutoCompleteTextView emailText;
-    @InjectView(id.et_password) protected EditText passwordText;
-    @InjectView(id.b_signin) protected Button signInButton;
-
-    private final TextWatcher watcher = validationTextWatcher();
-
+    private AccountManager accountManager;
     private SafeAsyncTask<Boolean> authenticationTask;
     private String authToken;
     private String authTokenType;
-
     /**
      * If set we are just checking that the user knows their credentials; this
      * doesn't cause the user's password to be changed on the device.
      */
     private Boolean confirmCredentials = false;
-
     private String email;
-
     private String password;
-
-
     /**
      * In this instance the token is simply the sessionId returned from Parse.com. This could be a
      * oauth token or some other type of timed token that expires/etc. We're just using the parse.com
      * sessionId to prove the example of how to utilize a token.
      */
     private String token;
-
-    /**
-     * Was the original caller asking for an entirely new account?
-     */
-    protected boolean requestNewAccount = false;
 
     @Override
     public void onCreate(Bundle bundle) {
@@ -134,10 +130,9 @@ public class BootstrapAuthenticatorActivity extends ActionBarAccountAuthenticato
 
         setContentView(layout.login_activity);
 
-        Views.inject(this);
+        ButterKnife.bind(this);
 
-        emailText.setAdapter(new ArrayAdapter<String>(this,
-                simple_dropdown_item_1line, userEmailAccounts()));
+        emailText.setAdapter(new ArrayAdapter<String>(this, simple_dropdown_item_1line, userEmailAccounts()));
 
         passwordText.setOnKeyListener(new OnKeyListener() {
 
@@ -163,7 +158,7 @@ public class BootstrapAuthenticatorActivity extends ActionBarAccountAuthenticato
             }
         });
 
-        emailText.addTextChangedListener(watcher);
+        usernameText.addTextChangedListener(watcher);
         passwordText.addTextChangedListener(watcher);
 
         final TextView signUpText = (TextView) findViewById(id.tv_signup);
@@ -189,12 +184,14 @@ public class BootstrapAuthenticatorActivity extends ActionBarAccountAuthenticato
         };
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        bus.register(this);
-        updateUIWithValidation();
-    }
+	private TextWatcher signupTextWatcher() {
+		return new TextWatcherAdapter() {
+			public void afterTextChanged(final Editable gitDirEditText) {
+				updateUISignupWithValidation();
+			}
+
+		};
+	}
 
     @Override
     protected void onPause() {
@@ -202,10 +199,22 @@ public class BootstrapAuthenticatorActivity extends ActionBarAccountAuthenticato
         bus.unregister(this);
     }
 
-    private void updateUIWithValidation() {
-        final boolean populated = populated(emailText) && populated(passwordText);
-        signInButton.setEnabled(populated);
+    @Override
+    protected void onResume() {
+        super.onResume();
+        bus.register(this);
+        updateUIWithValidation();
     }
+
+    private void updateUIWithValidation() {
+		final boolean populated = populated(usernameText) && populated(passwordText);
+		signInButton.setEnabled(populated);
+	}
+
+	private void updateUISignupWithValidation() {
+		final boolean populated = populated(usernameText) && populated(passwordText) && populated(emailText);
+		signUpButton.setEnabled(populated);
+	}
 
     private boolean populated(final EditText editText) {
         return editText.length() > 0;
@@ -233,6 +242,48 @@ public class BootstrapAuthenticatorActivity extends ActionBarAccountAuthenticato
         Toaster.showLong(BootstrapAuthenticatorActivity.this, R.string.message_bad_credentials);
     }
 
+	public void handleSignupUI(final View view)
+	{
+		View signup = ButterKnife.findById((View) view.getParent(),R.id.v_signup);
+		usernameText.addTextChangedListener(signupWatcher);
+		passwordText.addTextChangedListener(signupWatcher);
+		emailText.addTextChangedListener(signupWatcher);
+		signup.setVisibility(View.VISIBLE);
+		updateUISignupWithValidation();
+
+		signUpUIButton.setVisibility(View.GONE);
+		signInButton.setVisibility(View.GONE);
+
+	}
+
+	public void handleSignup(final View view)
+	{
+		ParseUser user = new ParseUser();
+		user.setUsername(usernameText.getText().toString());
+		user.setPassword(passwordText.getText().toString());
+		user.setEmail(emailText.getText().toString());
+
+        user.signUpInBackground(new SignUpCallback()
+        {
+            public void done(ParseException e)
+            {
+                if (e == null)
+                {
+                    // Hooray! Let them use the app now.
+					Ln.d("Hooray!");
+					handleLogin(view);
+                }
+                else
+                {
+                    // Sign up didn't succeed. Look at the ParseException
+                    // to figure out what went wrong
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+
     /**
      * Handles onClick event on the Submit button. Sends username/password to
      * the server for authentication.
@@ -247,7 +298,7 @@ public class BootstrapAuthenticatorActivity extends ActionBarAccountAuthenticato
         }
 
         if (requestNewAccount) {
-            email = emailText.getText().toString();
+            email = usernameText.getText().toString();
         }
 
         password = passwordText.getText().toString();
@@ -256,13 +307,17 @@ public class BootstrapAuthenticatorActivity extends ActionBarAccountAuthenticato
         authenticationTask = new SafeAsyncTask<Boolean>() {
             public Boolean call() throws Exception {
 
-                final String query = String.format("%s=%s&%s=%s",
-                        PARAM_USERNAME, email, PARAM_PASSWORD, password);
 
-                User loginResponse = bootstrapService.authenticate(email, password);
+						bootstrapService.authenticate(email, password);
+				ParseUser loginResponse = ParseUser.getCurrentUser();
                 token = loginResponse.getSessionToken();
 
                 return true;
+            }
+
+            @Override
+            public void onSuccess(final Boolean authSuccess) {
+                onAuthenticationResult(authSuccess);
             }
 
             @Override
@@ -272,13 +327,9 @@ public class BootstrapAuthenticatorActivity extends ActionBarAccountAuthenticato
                     final Throwable cause = e.getCause() != null ? e.getCause() : e;
                     if(cause != null) {
                         Toaster.showLong(BootstrapAuthenticatorActivity.this, cause.getMessage());
+						Ln.d("onException: failed to authenticate :%s", cause.getLocalizedMessage());
                     }
                 }
-            }
-
-            @Override
-            public void onSuccess(final Boolean authSuccess) {
-                onAuthenticationResult(authSuccess);
             }
 
             @Override

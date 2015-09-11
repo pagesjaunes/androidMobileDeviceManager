@@ -5,9 +5,8 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.MenuItem;
 
+import butterknife.ButterKnife;
 import fr.pagesjaunes.mdm.Injector;
-
-import butterknife.Views;
 
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
 import static android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP;
@@ -29,7 +28,7 @@ public abstract class BootstrapActivity extends ActionBarActivity {
         super.setContentView(layoutResId);
 
         // Used to inject views with the Butterknife library
-        Views.inject(this);
+        ButterKnife.bind(this);
     }
 
     @Override
@@ -47,4 +46,6 @@ public abstract class BootstrapActivity extends ActionBarActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
+
+
 }
