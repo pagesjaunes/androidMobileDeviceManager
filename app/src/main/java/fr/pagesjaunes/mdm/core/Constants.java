@@ -46,31 +46,14 @@ public final class Constants {
         public static final String URL_BASE = "https://api.parse.com";
 
 
-        /**
-         * Authentication URL
-         */
-        public static final String URL_AUTH_FRAG = "/1/login";
-        public static final String URL_AUTH = URL_BASE + URL_AUTH_FRAG;
 
-        /**
-         * List Users URL
-         */
-        public static final String URL_USERS_FRAG =  "/1/users";
-        public static final String URL_USERS = URL_BASE + URL_USERS_FRAG;
-
-
-        /**
-         * List News URL
-         */
-        public static final String URL_NEWS_FRAG = "/1/classes/News";
-        public static final String URL_NEWS = URL_BASE + URL_NEWS_FRAG;
 
 
         /**
          * List Checkin's URL
          */
-        public static final String URL_CHECKINS_FRAG = "/1/classes/Locations";
-        public static final String URL_CHECKINS = URL_BASE + URL_CHECKINS_FRAG;
+        public static final String URL_DEVICE_FRAG = "/1/classes/Device";
+        public static final String URL_DEVICE = URL_BASE + URL_DEVICE_FRAG;
 
         /**
          * PARAMS for auth
@@ -79,8 +62,8 @@ public final class Constants {
         public static final String PARAM_PASSWORD = "password";
 
 
-        public static final String PARSE_APP_ID = "zHb2bVia6kgilYRWWdmTiEJooYA17NnkBSUVsr4H";
-        public static final String PARSE_REST_API_KEY = "N2kCY1T3t3Jfhf9zpJ5MCURn3b25UpACILhnf5u9";
+        public static final String PARSE_APP_ID = "qKYdojVtMPjHxhNMJZ8sIlPVdKJQZYlFcaPfhKts";
+        public static final String PARSE_REST_API_KEY = "guCCkQKzdWtGErl2EsymtE9LXRgQUdRjmALPvyJv";
         public static final String HEADER_PARSE_REST_API_KEY = "X-Parse-REST-API-Key";
         public static final String HEADER_PARSE_APP_ID = "X-Parse-Application-Id";
         public static final String CONTENT_TYPE_JSON = "application/json";
@@ -96,6 +79,7 @@ public final class Constants {
         private Extra() {}
 
         public static final String NEWS_ITEM = "news_item";
+        public static final String APP_ITEM = "app_item";
 
         public static final String USER = "user";
 

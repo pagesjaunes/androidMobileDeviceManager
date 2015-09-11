@@ -26,12 +26,21 @@
     </LinearLayout>
 
     <TextView
-            android:id="@+id/tv_date"
+            android:id="@+id/tv_user"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="right"
             android:paddingLeft="15dp"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="@color/table_text_selector" />
+
+    <TextView
+        android:id="@+id/tv_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="right"
+        android:paddingLeft="15dp"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/table_text_selector" />
 
 </LinearLayout>

@@ -194,4 +194,38 @@ public class Strings {
         return namedFormat(str, map);
     }
 
+
+
+
+    public static String prettifyDiffRelativeDate(HashMap<String, Double> diff)
+    {
+        String prettyWoman = "";
+        String label;
+        String prefix = "";
+        if (diff.get("days") >= 1)
+        {
+            label = diff.get("hours") > 1       ? "jours"  : "jour";
+            prettyWoman += diff.get("days") + " " + label;
+        }
+        else
+        {
+            if (diff.get("hours") > 0)
+            {
+                 prefix  = prettyWoman.length() > 0  ? ", "      : "";
+                 label   = diff.get("hours") > 1 ? "heures"  : "heure";
+
+                prettyWoman += prefix + " " + diff.get("hours") + " " + label;
+            }
+
+            if (diff.get("minutes") > 0)
+            {
+                 prefix  = prettyWoman.length() > 0  ? " et "    : "";
+                 label   = diff.get("minutes") > 1 ? "minutes" : "minutes";
+
+                prettyWoman += prefix + " " + diff.get("minutes") + " " + label;
+            }
+        }
+        return prettyWoman;
+    }
+
 }

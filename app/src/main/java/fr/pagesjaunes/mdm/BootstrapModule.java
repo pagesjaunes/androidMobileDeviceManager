@@ -3,24 +3,6 @@ package fr.pagesjaunes.mdm;
 import android.accounts.AccountManager;
 import android.content.Context;
 
-import fr.pagesjaunes.mdm.authenticator.ApiKeyProvider;
-import fr.pagesjaunes.mdm.authenticator.BootstrapAuthenticatorActivity;
-import fr.pagesjaunes.mdm.authenticator.LogoutService;
-import fr.pagesjaunes.mdm.core.BootstrapService;
-import fr.pagesjaunes.mdm.core.Constants;
-import fr.pagesjaunes.mdm.core.PostFromAnyThreadBus;
-import fr.pagesjaunes.mdm.core.RestAdapterRequestInterceptor;
-import fr.pagesjaunes.mdm.core.RestErrorHandler;
-import fr.pagesjaunes.mdm.core.TimerService;
-import fr.pagesjaunes.mdm.core.UserAgentProvider;
-import fr.pagesjaunes.mdm.ui.BootstrapTimerActivity;
-import fr.pagesjaunes.mdm.ui.CheckInsListFragment;
-import fr.pagesjaunes.mdm.ui.MainActivity;
-import fr.pagesjaunes.mdm.ui.NavigationDrawerFragment;
-import fr.pagesjaunes.mdm.ui.NewsActivity;
-import fr.pagesjaunes.mdm.ui.NewsListFragment;
-import fr.pagesjaunes.mdm.ui.UserActivity;
-import fr.pagesjaunes.mdm.ui.UserListFragment;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.squareup.otto.Bus;
@@ -29,6 +11,19 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import fr.pagesjaunes.mdm.authenticator.ApiKeyProvider;
+import fr.pagesjaunes.mdm.authenticator.BootstrapAuthenticatorActivity;
+import fr.pagesjaunes.mdm.authenticator.LogoutService;
+import fr.pagesjaunes.mdm.core.BootstrapService;
+import fr.pagesjaunes.mdm.core.Constants;
+import fr.pagesjaunes.mdm.core.PostFromAnyThreadBus;
+import fr.pagesjaunes.mdm.core.RestAdapterRequestInterceptor;
+import fr.pagesjaunes.mdm.core.RestErrorHandler;
+import fr.pagesjaunes.mdm.core.UserAgentProvider;
+import fr.pagesjaunes.mdm.ui.DevicesListFragment;
+import fr.pagesjaunes.mdm.ui.MainActivity;
+import fr.pagesjaunes.mdm.ui.NavigationDrawerFragment;
+import fr.pagesjaunes.mdm.ui.UserActivity;
 import retrofit.RestAdapter;
 import retrofit.converter.GsonConverter;
 
@@ -43,14 +38,9 @@ import retrofit.converter.GsonConverter;
                 BootstrapApplication.class,
                 BootstrapAuthenticatorActivity.class,
                 MainActivity.class,
-                BootstrapTimerActivity.class,
-                CheckInsListFragment.class,
+                DevicesListFragment.class,
                 NavigationDrawerFragment.class,
-                NewsActivity.class,
-                NewsListFragment.class,
-                UserActivity.class,
-                UserListFragment.class,
-                TimerService.class
+                UserActivity.class
         }
 )
 public class BootstrapModule {

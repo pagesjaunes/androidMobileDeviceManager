@@ -3,19 +3,19 @@ package fr.pagesjaunes.mdm.ui;
 
 import android.view.LayoutInflater;
 
+import java.util.List;
+
 import fr.pagesjaunes.mdm.R;
 import fr.pagesjaunes.mdm.R.drawable;
-import com.github.kevinsawicki.wishlist.SingleTypeAdapter;
-
-import java.util.List;
+import fr.pagesjaunes.mdm.wishlist.SingleTypeAdapter;
 
 /**
  * List adapter that colors rows in alternating colors
  *
  * @param <V>
  */
-public abstract class AlternatingColorListAdapter<V> extends
-        SingleTypeAdapter<V> {
+public abstract class AlternatingColorListAdapter<V> extends SingleTypeAdapter<V>
+{
 
     private final int primaryResource;
 

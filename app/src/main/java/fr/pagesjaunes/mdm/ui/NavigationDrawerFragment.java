@@ -1,6 +1,5 @@
 package fr.pagesjaunes.mdm.ui;
 
-import android.app.Activity;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -19,13 +18,14 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.squareup.otto.Bus;
+
+import javax.inject.Inject;
+
 import fr.pagesjaunes.mdm.Injector;
 import fr.pagesjaunes.mdm.R;
 import fr.pagesjaunes.mdm.events.NavItemSelectedEvent;
 import fr.pagesjaunes.mdm.util.UIUtils;
-import com.squareup.otto.Bus;
-
-import javax.inject.Inject;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
@@ -108,8 +108,7 @@ public class NavigationDrawerFragment extends Fragment {
                 android.R.layout.simple_list_item_1,
                 android.R.id.text1,
                 new String[] {
-                        getString(R.string.title_home),
-                        getString(R.string.title_timer)
+                        getString(R.string.title_home)
                 }));
         drawerListView.setItemChecked(currentSelectedPosition, true);
         return drawerListView;
@@ -207,7 +206,6 @@ public class NavigationDrawerFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
         outState.putInt(STATE_SELECTED_POSITION, currentSelectedPosition);
     }
 

@@ -21,17 +21,16 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import java.util.Collections;
+import java.util.List;
+
 import fr.pagesjaunes.mdm.R;
 import fr.pagesjaunes.mdm.R.id;
 import fr.pagesjaunes.mdm.R.layout;
 import fr.pagesjaunes.mdm.authenticator.LogoutService;
-import com.github.kevinsawicki.wishlist.SingleTypeAdapter;
-import com.github.kevinsawicki.wishlist.Toaster;
-import com.github.kevinsawicki.wishlist.ViewUtils;
-
-import java.util.Collections;
-import java.util.List;
-
+import fr.pagesjaunes.mdm.wishlist.SingleTypeAdapter;
+import fr.pagesjaunes.mdm.wishlist.Toaster;
+import fr.pagesjaunes.mdm.wishlist.ViewUtils;
 
 /**
  * Base fragment for displaying a list of items that loads with a progress bar
@@ -292,7 +291,7 @@ public abstract class ItemListFragment<E> extends Fragment
     /**
      * Refresh the list with the progress bar showing
      */
-    protected void refreshWithProgress() {
+    public void refreshWithProgress() {
         items.clear();
         setListShown(false);
         refresh();
