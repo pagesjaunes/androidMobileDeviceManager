@@ -197,7 +197,7 @@ public class Strings {
 
 
 
-    public static String prettifyDiffRelativeDate(HashMap<String, Double> diff)
+    public static String prettifyDiffRelativeDate(HashMap<String, Integer> diff)
     {
         String prettyWoman = "";
         String label;
@@ -220,7 +220,7 @@ public class Strings {
             if (diff.get("minutes") > 0)
             {
                  prefix  = prettyWoman.length() > 0  ? " et "    : "";
-                 label   = diff.get("minutes") > 1 ? "minutes" : "minutes";
+                 label   = diff.get("minutes") > 1 ? "minutes" : "minute";
 
                 prettyWoman += prefix + " " + diff.get("minutes") + " " + label;
             }

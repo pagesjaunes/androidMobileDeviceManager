@@ -3,12 +3,14 @@
 package fr.pagesjaunes.mdm.ui;
 
 import android.accounts.OperationCanceledException;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
+import android.telephony.TelephonyManager;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
@@ -256,25 +258,27 @@ getCurrentUser();
 
 	private Boolean updateCurrentDevice()
 	{
-		SharedPreferences prefs = this.getSharedPreferences(PREFS_NAME, 0);
+		final SharedPreferences prefs = this.getSharedPreferences(PREFS_NAME, 0);
 		Device currentDevice;
 		String deviceId = prefs.getString("deviceId", null);
+		final TelephonyManager tm = (TelephonyManager) getBaseContext().getSystemService(Context.TELEPHONY_SERVICE);
 
-		currentDevice = new Device();
+
 		if (deviceId != null)
 		{
 			currentDevice = (Device) Device.createWithoutData("Device", deviceId);
+
 			currentDevice.fetchIfNeededInBackground(new GetCallback<ParseObject>()
 			{
 				@Override
 				public void done(ParseObject object, ParseException e)
 				{
-                    if (object != null)
+					if (object != null)
                     {
-                        Device currentDevice = (Device) object;
-                        currentDevice.setManufacturer(android.os.Build.BRAND);
-                        currentDevice.setModel(android.os.Build.MODEL);
-                        currentDevice.setType("");
+						Device currentDevice = (Device) object;
+						currentDevice.setManufacturer(android.os.Build.BRAND);
+						currentDevice.setModel(android.os.Build.MODEL);
+						currentDevice.setType("" + tm.getDeviceId());
                         currentDevice.setOsVersion(android.os.Build.VERSION.RELEASE);
                         currentDevice.setUser(ParseUser.getCurrentUser());
                         currentDevice.saveInBackground();
@@ -287,10 +291,11 @@ getCurrentUser();
 			});
 		} else
 		{
-
+			currentDevice = new Device();
+			final Device savedDevice = currentDevice;
 			currentDevice.setManufacturer(android.os.Build.BRAND);
 			currentDevice.setModel(android.os.Build.MODEL);
-			currentDevice.setType("");
+			currentDevice.setType("" + tm.getDeviceId());
 			currentDevice.setOsVersion(android.os.Build.VERSION.RELEASE);
 			currentDevice.setUser(ParseUser.getCurrentUser());
 
@@ -299,16 +304,12 @@ getCurrentUser();
 				@Override
 				public void done(ParseException e)
 				{
-					Ln.d("Save ");
+					Ln.d("Saved ");
+					SharedPreferences.Editor editor = prefs.edit();
+					editor.putString("deviceId", savedDevice.getObjectId());
+					editor.commit();
 				}
 			});
-		}
-		if (deviceId == null)
-		{
-			SharedPreferences.Editor editor = prefs.edit();
-			deviceId = currentDevice.getObjectId();
-			editor.putString("deviceId", deviceId);
-			editor.commit();
 		}
 
 		//		Toast.makeText(getActivity().getApplicationContext(), "" + Build.BRAND + Build.DEVICE + Build.MANUFACTURER + "etc..", Toast.LENGTH_LONG).show();

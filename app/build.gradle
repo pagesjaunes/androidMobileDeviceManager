@@ -19,6 +19,15 @@ android {
         versionCode getDate() as int
         versionName "1.0"
     }
+    signingConfigs {
+        release {
+            storeFile file(".keystore/keystore")
+            storePassword "PagesJaunesAndroid"
+            keyAlias "pagesjaunesandroid_keystore"
+            keyPassword "PagesJaunesAndroid"
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -30,14 +39,7 @@ android {
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/NOTICE.txt'
     }
-    signingConfigs {
-        release {
-            storeFile file(".keystore/keystore")
-            storePassword "PagesJaunesAndroid"
-            keyAlias "pagesjaunesandroid_keystore"
-            keyPassword "PagesJaunesAndroid"
-        }
-    }
+
 }
 
 dependencies {
