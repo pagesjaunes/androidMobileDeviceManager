@@ -64,7 +64,7 @@ public class BootstrapApplication extends Application {
         // Add your initialization code here
 		Parse.initialize(this, "qKYdojVtMPjHxhNMJZ8sIlPVdKJQZYlFcaPfhKts", "lgrLheiLQXSX5v58d3XMxgBsethavM2aQMnE27m8");
 		ParseUser.enableRevocableSessionInBackground();
-		//ParseUser.enableAutomaticUser();
+		ParseUser.enableAutomaticUser();
         ParseACL defaultACL = new ParseACL();
         // Optionally enable public read access.
          defaultACL.setPublicReadAccess(true);

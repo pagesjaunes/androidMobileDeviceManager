@@ -19,6 +19,11 @@ android {
         versionCode getDate() as int
         versionName "1.0"
     }
+storeFile file(".keystore/keystore.jks")
+            storePassword "AndroidDevsAreGenius"
+            keyAlias "android_keystore_dev"
+            keyPassword "AndroidDevsAreGenius"
+
     buildTypes {
         release {
             minifyEnabled false
@@ -29,6 +34,7 @@ android {
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/NOTICE.txt'
     }
+
 }
 
 dependencies {
