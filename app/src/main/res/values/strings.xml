@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+
+  <string name="app_name">mdm_DT</string>
+  <string name="title_home">Home</string>
+  <string name="home">Home</string>
+    <string name="content_column">Content</string>
+    <string name="page_referrers">Referrers</string>
+    <string name="refresh_action">Refresh</string>
+    <string name="logout_action">Logout</string>
+    <string name="page_news">Devices</string>
+    <string name="page_users">Users</string>
+    <string name="device_column">device</string>
+    <string name="user_column">User</string>
+    <string name="date_column">Date</string>
+    <string name="error_loading_users">Loading users failed</string>
+    <string name="error_loading_news">Loading devices failed</string>
+    <string name="error_loading_checkins">Loading check-ins failed</string>
+    <string name="no_users">No Users</string>
+    <string name="no_news">No Device</string>
+    <string name="avatar">Avatar</string>
+    <string name="choose">Choose</string>
+
+    <!-- AuthenticatorActivity -->
+    <string name="label_username">Username</string>
+    <string name="label_email_address">Email</string>
+    <string name="label_password">Password</string>
+    <string name="label_sign_in">Connexion</string>
+    <string name="label_sign_up">Inscription</string>
+    <string name="message_signing_in">se connecter…</string>
+    <string name="blank_field_warning">champ obligatoire</string>
+    <string name="signup_link">New to Bootstrap? &lt;a href=http://www.androidbootstrap.com>Click here&lt;/a> to learn more.</string>
+    <string name="message_bad_credentials">Email Address or Password is incorrect</string>
+    <string name="message_auth_failed">Un mot de passe valide</string>
+    <string name="message_auth_failed_new_account">Please enter a valid email address &amp; password</string>
+    <string name="navigation_drawer_open">Drawer Open</string>
+    <string name="navigation_drawer_close">Drawer Close</string>
+
+
+</resources>
