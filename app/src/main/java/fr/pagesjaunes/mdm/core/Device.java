@@ -108,10 +108,10 @@ public class Device extends ParseObject implements Serializable {
 			double min = Math.floor(leftSec / (60));
 			leftSec = leftSec - min * 60;
 
-			HashMap<String, Double> result = new HashMap<String, Double>();
-			result.put("days", days);
-			result.put("hours", hrs);
-			result.put("minutes", min);
+			HashMap<String, Integer> result = new HashMap<String, Integer>();
+			result.put("days", (int)days);
+			result.put("hours", (int)hrs);
+			result.put("minutes", (int)min);
 			return Strings.prettifyDiffRelativeDate(result);
 		}
 		return "n/a";

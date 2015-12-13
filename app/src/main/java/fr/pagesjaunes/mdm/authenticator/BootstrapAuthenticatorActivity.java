@@ -23,7 +23,7 @@ import android.widget.TextView.OnEditorActionListener;
 
 import com.parse.ParseException;
 import com.parse.ParseUser;
-import com.parse.SignUpCallback;
+import com.parse.SaveCallback;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
@@ -226,13 +226,16 @@ public class BootstrapAuthenticatorActivity extends ActionBarAccountAuthenticato
         dialog.setMessage(getText(string.message_signing_in));
         dialog.setIndeterminate(true);
         dialog.setCancelable(true);
-        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            public void onCancel(final DialogInterface dialog) {
-                if (authenticationTask != null) {
-                    authenticationTask.cancel(true);
-                }
-            }
-        });
+        dialog.setOnCancelListener(new DialogInterface.OnCancelListener()
+		{
+			public void onCancel(final DialogInterface dialog)
+			{
+				if (authenticationTask != null)
+				{
+					authenticationTask.cancel(true);
+				}
+			}
+		});
         return dialog;
     }
 
@@ -258,25 +261,26 @@ public class BootstrapAuthenticatorActivity extends ActionBarAccountAuthenticato
 
 	public void handleSignup(final View view)
 	{
-		ParseUser user = new ParseUser();
+		showProgress();
+		ParseUser user = ParseUser.getCurrentUser();
 		user.setUsername(usernameText.getText().toString());
 		user.setPassword(passwordText.getText().toString());
 		user.setEmail(emailText.getText().toString());
 
-        user.signUpInBackground(new SignUpCallback()
-        {
-            public void done(ParseException e)
-            {
-                if (e == null)
-                {
-                    // Hooray! Let them use the app now.
+        user.saveInBackground(new SaveCallback()
+		{
+			public void done(ParseException e)
+			{
+				if (e == null)
+				{
+					// Hooray! Let them use the app now.
 					Ln.d("Hooray!");
 					handleLogin(view);
-                }
-                else
-                {
-                    // Sign up didn't succeed. Look at the ParseException
-                    // to figure out what went wrong
+				}
+				else
+				{
+					// Sign up didn't succeed. Look at the ParseException
+					// to figure out what went wrong
 					e.printStackTrace();
 				}
 			}
