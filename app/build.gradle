@@ -19,11 +19,14 @@ android {
         versionCode getDate() as int
         versionName "1.0"
     }
-storeFile file(".keystore/keystore.jks")
+     signingConfigs {
+         release {
+            storeFile file(".keystore/keystore.jks")
             storePassword "AndroidDevsAreGenius"
             keyAlias "android_keystore_dev"
             keyPassword "AndroidDevsAreGenius"
-
+          }
+    }
     buildTypes {
         release {
             minifyEnabled false
