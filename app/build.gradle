@@ -10,7 +10,7 @@ def getDate() {
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.1"
+    buildToolsVersion "23.0.2"
 
     defaultConfig {
         applicationId "fr.pagesjaunes.mdm"
@@ -19,11 +19,14 @@ android {
         versionCode getDate() as int
         versionName "1.0"
     }
-storeFile file(".keystore/keystore.jks")
+     signingConfigs {
+         release {
+            storeFile file(".keystore/keystore.jks")
             storePassword "AndroidDevsAreGenius"
             keyAlias "android_keystore_dev"
             keyPassword "AndroidDevsAreGenius"
-
+          }
+    }
     buildTypes {
         release {
             minifyEnabled false
@@ -39,7 +42,7 @@ storeFile file(".keystore/keystore.jks")
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:23.0.1'
+    compile 'com.android.support:appcompat-v7:23.+'
     compile 'com.google.code.gson:gson:2.3.1'
     compile 'com.squareup.dagger:dagger:1.2.2'
     apt 'com.squareup.dagger:dagger-compiler:1.2.2'
