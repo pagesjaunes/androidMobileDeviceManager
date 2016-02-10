@@ -3,3 +3,5 @@
 
 This repository contains the source code for the [mdm_DT](http://www.androidbootstrap.com/)
 
+added in bitrise automatic build chain
+
