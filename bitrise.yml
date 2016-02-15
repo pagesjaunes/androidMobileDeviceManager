@@ -1,0 +1,45 @@
+---
+format_version: 1.1.0
+default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
+app:
+  envs:
+  - BITRISE_PROJECT_PATH: "./build.gradle"
+    opts:
+      is_expand: false
+  - GRADLE_TASK: app:assemble
+    opts:
+      is_expand: false
+  - GRADLEW_PATH: "./gradlew"
+    opts:
+      is_expand: false
+trigger_map:
+- pattern: merge
+  is_pull_request_allowed: false
+  workflow: merge
+- pattern: "(develop|master)"
+  is_pull_request_allowed: false
+  workflow: primary
+workflows:
+  primary:
+    steps:
+    - activate-ssh-key@3.1.0:
+        title: Activate App SSH key
+        inputs:
+        - ssh_key_save_path: "$HOME/.ssh/steplib_ssh_step_id_rsa"
+    - git-clone@3.1.0: {}
+    - gradle-runner@1.2.0:
+        inputs:
+        - gradle_file: "$BITRISE_PROJECT_PATH"
+        - gradle_task: "$GRADLE_TASK"
+  merge:
+    steps:
+    - activate-ssh-key@3.1.0:
+        title: Activate App SSH key
+        inputs:
+        - ssh_key_save_path: "$HOME/.ssh/steplib_ssh_step_id_rsa"
+    - git::git@github.com/PagesjaunesMobile/steps-github-merge.git@master:
+    - gradle-runner@1.2.0:
+        inputs:
+        - gradle_file: "$BITRISE_PROJECT_PATH"
+        - gradle_task: "assembleNightlydebug, assembleNightlyrelease"
+    - deploy-to-bitrise-io@1.2.2: {}
