@@ -5,3 +5,5 @@ This repository contains the source code for the [mdm_DT](http://www.androidboot
 
 added in bitrise automatic build chain
 
+bump change test 1
+
